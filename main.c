@@ -1,9 +1,3 @@
-/**
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
- *
- * SPDX-License-Identifier: BSD-3-Clause
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,19 +6,6 @@
 #include "hardware/clocks.h"
 #include "ws2812.pio.h"
 
-/**
- * NOTE:
- *  Take into consideration if your WS2812 is a RGB or RGBW variant.
- *
- *  If it is RGBW, you need to set IS_RGBW to true and provide 4 bytes per 
- *  pixel (Red, Green, Blue, White) and use urgbw_u32().
- *
- *  If it is RGB, set IS_RGBW to false and provide 3 bytes per pixel (Red,
- *  Green, Blue) and use urgb_u32().
- *
- *  When RGBW is used with urgb_u32(), the White channel will be ignored (off).
- *
- */
 #define IS_RGBW false
 #define NUM_PIXELS 25
 
@@ -59,14 +40,14 @@ static inline uint32_t urgbw_u32(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
             (uint32_t) (b);
 }
 
-static inline void acender_leds(PIO pio, uint sm, uint len, int leds[], int row) {
+static inline void acender_leds(PIO pio, uint sm, uint len, int leds[], int row, uint32_t cor) {
     // Apaga todos os LEDs
     for (uint i = 0; i < len; ++i) {
         bool led_aceso = false;
         // Verifica se o LED atual deve ser aceso (comparando com a linha do vetor de LEDs)
         for (int j = 0; j <= row; ++j) {
             if (leds[j] == i) {
-                put_pixel(pio, sm, urgb_u32(0x03, 0, 0)); // Acende o LED (exemplo: vermelho)
+                put_pixel(pio, sm, cor); // Acende o LED na cor especificada
                 led_aceso = true;
                 break;
             }
@@ -77,10 +58,12 @@ static inline void acender_leds(PIO pio, uint sm, uint len, int leds[], int row)
     }
 }
 
-
 int main() {
     stdio_init_all();
-    printf("WS2812 Smoke Test, usando pino %d\n", WS2812_PIN);
+    
+    gpio_init(6);
+    gpio_set_dir(6, GPIO_IN);
+    gpio_pull_up(6);
 
     PIO pio;
     uint sm;
@@ -109,18 +92,51 @@ int main() {
         {16, 14},
         {17, 16, 14},
         {18, 17, 16, 14},
-        {10, 18, 17, 16,14},
+        {10, 18, 17, 16, 14},
         {8, 10, 18, 17, 16, 14},
         {7, 8, 10, 18, 17, 16, 14}
     };
+
+    int vazia[] = {};
+    // Definição das cores
+    uint32_t cores[4] = {
+        urgb_u32(20, 0, 0),    // Vermelho (R, G, B)
+        urgb_u32(0, 0, 20),    // Azul (R, G, B)
+        urgb_u32(0, 20, 0),    // Verde (R, G, B)
+        urgb_u32(20, 20, 20) // Branco (R, G, B)
+    };
+
+    int cor_index = 0;
+
     while (1) {
-        for (int row = 0; row < 8; ++row) {
-            acender_leds(pio, sm, 25, inicial[row], row);
-            sleep_ms(200); // Espera 500ms entre as linhas
+        if(!gpio_get(6))
+        {
+        // Executa os loops 4 vezes com cores diferentes
+        for (int ciclo = 0; ciclo < 4; ++ciclo) {
+            // Loop para a matriz inicial
+            for (int row = 0; row < 8; ++row) {
+                acender_leds(pio, sm, 25, inicial[row], row, cores[cor_index]);
+                sleep_ms(200); // Espera 200ms entre as linhas
+            }
+            
+            // Loop para a matriz final
+            for (int row = 6; row >= 0; --row) {
+                acender_leds(pio, sm, 25, final[row], row, cores[cor_index]);
+                sleep_ms(200); // Espera 200ms entre as linhas
+            }
+
+            // Muda a cor para o próximo ciclo
+            cor_index = (cor_index + 1) % 4;
         }
-        for (int row = 6; row >= 0; --row) {
-            acender_leds(pio, sm, 25, final[row], row);
-            sleep_ms(200); // Espera 500ms entre as linhas
+        acender_leds(pio, sm, 25, inicial[7], 7, cores[3]);
+        sleep_ms(300);
+        for(int i = 0; i < 3; i++)
+        {
+        acender_leds(pio, sm, 25, inicial[7], 7, urgb_u32(0,0,0));
+        sleep_ms(300);
+        acender_leds(pio, sm, 25, inicial[7], 7, cores[3]);
+        sleep_ms(300);
+        }
         }
     }
 
