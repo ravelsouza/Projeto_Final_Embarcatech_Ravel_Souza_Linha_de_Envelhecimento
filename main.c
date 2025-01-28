@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
@@ -80,6 +79,8 @@ static inline void teste_esteira(PIO pio, uint sm, uint len, int leds[], int row
 
 int main() {
     stdio_init_all();
+    uint32_t start_time = time_us_32();
+    uint8_t minutos = 0;
     gpio_init(6);
     gpio_set_dir(6, GPIO_IN);
     gpio_pull_up(6);
@@ -142,7 +143,6 @@ int main() {
     };
 
     int cor_index = 0;
-
     while (1) {
         if(!gpio_get(6))
         {
@@ -173,77 +173,108 @@ int main() {
         sleep_ms(300);
         }
         uint32_t simulacao[8] = {};
-        
+        uint32_t quantidade[8] = {};
+        int a = 0;
         while(1)
         {
+        
         if(gpio_get(4))
         {
-            simulacao[0] = urgb_u32(0,50,0);
+            quantidade[0] = 1;
+            simulacao[0] = urgb_u32(0,5,0);
         }
         else
         {
-            simulacao[0] = urgb_u32(50,0,0);
+            quantidade[0] = 0;
+            simulacao[0] = urgb_u32(5,0,0);
         }
         if(gpio_get(8))
         {
-            simulacao[1] = urgb_u32(0,50,0);
+            quantidade[1] = 1;
+            simulacao[1] = urgb_u32(0,5,0);
         }
         else
         {
-            simulacao[1] = urgb_u32(50,0,0);
+            quantidade[1] = 0;
+            simulacao[1] = urgb_u32(5,0,0);
         }
         if(gpio_get(9))
         {
-             simulacao[2] = urgb_u32(0,50,0);
+            quantidade[2] = 1;
+             simulacao[2] = urgb_u32(0,5,0);
         }
         else
         {
-            simulacao[2] = urgb_u32(50,0,0);
+            quantidade[2] = 0;
+            simulacao[2] = urgb_u32(5,0,0);
         }
         if(gpio_get(16))
         {    
-            simulacao[3] = urgb_u32(0,50,0);
+            quantidade[3] = 1;
+            simulacao[3] = urgb_u32(0,5,0);
         }
         else
         {
-            simulacao[3] = urgb_u32(50,0,0);
+            quantidade[3] = 0;
+            simulacao[3] = urgb_u32(5,0,0);
         }
         if(gpio_get(17))
         {
-              simulacao[4] = urgb_u32(0,50,0);
+            quantidade[4] = 1;
+              simulacao[4] = urgb_u32(0,5,0);
         }
         else
         {
-            simulacao[4] = urgb_u32(50,0,0);
+            quantidade[4] = 0;
+            simulacao[4] = urgb_u32(5,0,0);
         }
         if(gpio_get(18))
         {
-             simulacao[5] = urgb_u32(0,50,0);
+            quantidade[5] = 1;
+             simulacao[5] = urgb_u32(0,5,0);
         }
         else
         {
-            simulacao[6] = urgb_u32(50,0,0);
+            quantidade[5] = 0;
+            simulacao[5] = urgb_u32(5,0,0);
         }
         if(gpio_get(19))
         {
-             simulacao[6] = urgb_u32(0,50,0);
+            quantidade[6] = 1;
+             simulacao[6] = urgb_u32(0,5,0);
         }
         else
         {
-            simulacao[6] = urgb_u32(50,0,0);
+            quantidade[6] = 0;
+            simulacao[6] = urgb_u32(5,0,0);
         }
 
         if(gpio_get(20))
         {
-              simulacao[7] = urgb_u32(0,50,0);
+            quantidade[7] = 1;
+              simulacao[7] = urgb_u32(0,5,0);
         }
+
         else
         {
-            simulacao[7] = urgb_u32(50,0,0);
+            quantidade[7] = 0;
+            simulacao[7] = urgb_u32(5,0,0);
         }
         teste_esteira(pio, sm, 25, inicial[7], 7, simulacao);
+        printf("%d %d %d ", quantidade[0], quantidade[1], quantidade[2]);
+        printf("%d %d %d ", quantidade[3], quantidade[4], quantidade[5]);
+        printf("%d %d ", quantidade[6], quantidade[7]);
+        uint32_t current_time = time_us_32();
+        uint32_t tempo_de_teste = (current_time - start_time)/1000000;
+        printf("%d:%u\n", minutos, tempo_de_teste);
+        if(tempo_de_teste == 59)
+        {
+            minutos += 1;
+            start_time = time_us_32();
+        }
         sleep_ms(1000);
         }
+        
         }
     }
 
