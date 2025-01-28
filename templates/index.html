@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leitura da Porta Serial</title>
+    <style>
+      .navbar {
+        color: white;
+        text-align: center;
+        margin-left: 0px;
+        top: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+        width: 100vw;
+        padding: 20px;
+        background-color: purple;
+        font-size: 40px;
+      }
+      body {
+        display: flex;
+        flex-direction: row;
+        width: 100vw;
+        margin-top: 70px;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        flex-direction: row;
+        height: 360px;
+        width: 650px;
+        border-radius: 500px;
+        padding: 20px;
+        border: 1px solid black;
+        margin-top: 30px;
+      }
+      .dados {
+        display: none;
+        height: 100%;
+        border: 1px solid black;
+        border-radius: 200px;
+        background-color: greenyellow;
+      }
+      .erro {
+        font-size: 20px;
+        color: red;
+        margin-top: 10px;
+      }
+      .coluna {
+        height: 360px;
+        width: 600px;
+        display: flex;
+        flex-direction: column;
+      }
+      .luminaria {
+        height: 100%;
+        width: 120px;
+        border-radius: 200px;
+        background-color: red;
+      }
+      .lacuna {
+        height: 100%;
+        width: 120px;
+      }
+      .container-relatorio {
+        margin: 50px auto 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #ecf0f1;
+        border-radius: 25px;
+        padding: 10px;
+        width: 70%;
+        max-width: 1000px;
+        box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
+      }
+      .relatorio {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .relatorio-luminarias {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .luminaria-acesa,
+      .luminaria-apagada {
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 16px;
+        text-align: center;
+        color: #2c3e50;
+      }
+
+      .luminaria-acesa {
+        background-color: #1abc9c;
+        border: 1px solid #16a085;
+      }
+
+      .luminaria-apagada {
+        background-color: #95a5a6;
+        border: 1px solid #7f8c8d;
+      }
+
+      .temperatura {
+        padding: 15px 25px;
+        background-color: #f39c12;
+        color: white;
+        font-size: 18px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .erro {
+        font-size: 18px;
+        color: #e74c3c;
+        margin-top: 20px;
+      }
+
+      .chart {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grafico {
+        background-color: aliceblue;
+        margin-top: 50px;
+        height: 400px;
+        width: 100%;
+        border-radius: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+      .esteira {
+      }
+    </style>
+  </head>
+  <header class="navbar"><strong>PROJETO FINAL EMBARCATECH</strong></header>
+  <body>
+    <div>
+      <h1>LINHA DE TESTE DE LUMINÁRIAS</h1>
+      <div class="container">
+        <div class="coluna">
+          <div class="lacuna"></div>
+          <div class="luminaria"><div class="dados" id="dados1"></div></div>
+          <div class="lacuna"></div>
+        </div>
+        <div class="coluna">
+          <div class="luminaria"><div class="dados" id="dados2"></div></div>
+          <div class="lacuna"></div>
+          <div class="luminaria"><div class="dados" id="dados3"></div></div>
+        </div>
+        <div class="coluna">
+          <div class="luminaria"><div class="dados" id="dados4"></div></div>
+          <div class="lacuna"></div>
+          <div class="luminaria"><div class="dados" id="dados5"></div></div>
+        </div>
+        <div class="coluna">
+          <div class="luminaria"><div class="dados" id="dados6"></div></div>
+          <div class="lacuna"></div>
+          <div class="luminaria"><div class="dados" id="dados7"></div></div>
+        </div>
+        <div class="coluna">
+          <div class="lacuna"></div>
+          <div class="luminaria"><div class="dados" id="dados8"></div></div>
+          <div class="lacuna"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Relatório -->
+    <div class="container-relatorio">
+      <h1>RELATÓRIO</h1>
+      <div class="chart">
+        <div class="relatorio">
+          <div class="relatorio-luminarias">
+            <div class="luminaria-acesa">
+              Luminárias acesas:
+              <div class="quantidade" id="lacesa">antes</div>
+            </div>
+            <div class="luminaria-apagada">Luminárias apagadas: 6</div>
+          </div>
+          <div class="temperatura">Tempo de Teste (min: 6 horas):</div>
+        </div>
+        <div class="grafico"></div>
+      </div>
+    </div>
+
+    <!-- Incluindo o Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+      // Conecta ao servidor WebSocket
+      var socket = io.connect(
+        "http://" + document.domain + ":" + location.port,
+      );
+
+      // Escuta o evento 'novo_dado' emitido pelo servidor
+      socket.on("novo_dado", function (data) {
+        // Função para mostrar ou esconder a div com base no valor do dado
+        function atualizarDado(id, valor) {
+          var elemento = document.getElementById(id);
+          if (valor === "1") {
+            elemento.style.display = "block"; // Exibe o dado
+          } else {
+            elemento.style.display = "none"; // Oculta o dado
+          }
+        }
+
+        // Atualizando os dados das luminárias com base no valor recebido
+        atualizarDado("dados1", data.dados[0]);
+        atualizarDado("dados2", data.dados[1]);
+        atualizarDado("dados3", data.dados[2]);
+        atualizarDado("dados4", data.dados[3]);
+        atualizarDado("dados5", data.dados[4]);
+        atualizarDado("dados6", data.dados[5]);
+        atualizarDado("dados7", data.dados[6]);
+        atualizarDado("dados8", data.dados[7]);
+      });
+
+      // Tratamento para erro
+      socket.on("connect_error", function () {
+        document.getElementById("erro").textContent =
+          "Não foi possível se conectar ao servidor WebSocket.";
+      });
+
+      // Função para enviar o valor 1 ao clicar no botão "Gerar alerta"
+      document.getElementById("lacesa").innerHTML = data.dados[7];
+    </script>
+  </body>
+</html>
