@@ -15,7 +15,7 @@
         position: absolute;
         width: 100vw;
         padding: 20px;
-        background-color: purple;
+        background: linear-gradient(150deg, #5d3fd3, purple, #5d3fd3);
         font-size: 40px;
       }
       body {
@@ -41,9 +41,8 @@
       .dados {
         display: none;
         height: 100%;
-        border: 1px solid black;
         border-radius: 200px;
-        background-color: greenyellow;
+        background: linear-gradient(150deg, greenyellow, green);
       }
       .erro {
         font-size: 20px;
@@ -60,13 +59,14 @@
         height: 100%;
         width: 120px;
         border-radius: 200px;
-        background-color: red;
+        background: linear-gradient(150deg, red, #ff7f7f);
       }
       .lacuna {
         height: 100%;
         width: 120px;
       }
       .container-relatorio {
+        border: 1px solid black;
         margin: 50px auto 0 auto;
         display: flex;
         flex-direction: column;
@@ -84,12 +84,19 @@
         gap: 20px;
         flex-wrap: wrap;
         justify-content: center;
+        width: 95%;
       }
 
       .relatorio-luminarias {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 10px;
+        width: 100%;
+      }
+
+      .column,
+      .tempo-de-teste {
+        flex: 1; /* Faz com que ambas ocupem o mesmo espaço */
       }
 
       .luminaria-acesa,
@@ -100,18 +107,18 @@
         text-align: center;
         color: #2c3e50;
       }
-
-      .luminaria-acesa {
-        background-color: #1abc9c;
-        border: 1px solid #16a085;
+      .div-tensao,
+      .div-corrente {
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 16px;
+        text-align: center;
+        color: #2c3e50;
       }
 
-      .luminaria-apagada {
-        background-color: #95a5a6;
-        border: 1px solid #7f8c8d;
-      }
-
-      .temperatura {
+      .tempo-de-teste {
+        display: flex;
+        flex-direction: column;
         padding: 15px 25px;
         background-color: #f39c12;
         color: white;
@@ -128,16 +135,23 @@
       }
 
       .chart {
+        margin-top: 20px;
         display: flex;
         flex-direction: column;
+        background-color: white;
+        border-radius: 12px;
+        height: 100px;
+        width: 100%;
+      }
+
+      .canva
+      {
+        height: 100px;
+        width: 90%;
+        background-color: aliceblue;
       }
 
       .grafico {
-        background-color: aliceblue;
-        margin-top: 50px;
-        height: 400px;
-        width: 100%;
-        border-radius: 20px;
       }
 
       @media (max-width: 768px) {
@@ -147,6 +161,23 @@
         }
       }
       .esteira {
+      }
+
+      .tensao,
+      .corrente {
+        font-size: 20px;
+        margin: 10px auto;
+      }
+      .text {
+        top: 0;
+      }
+      .tempo {
+        font-size: 60px;
+        margin: auto;
+      }
+      .column {
+        display: flex;
+        flex-direction: column;
       }
     </style>
   </head>
@@ -185,29 +216,111 @@
     <!-- Relatório -->
     <div class="container-relatorio">
       <h1>RELATÓRIO</h1>
-      <div class="chart">
-        <div class="relatorio">
-          <div class="relatorio-luminarias">
-            <div class="luminaria-acesa">
-              Luminárias acesas:
-              <div class="quantidade" id="lacesa">antes</div>
+
+      <div class="relatorio">
+        <div class="relatorio-luminarias">
+          <div class="column">
+            <div class="luminaria-acesa" style="background-color: #3CB371">
+              <div class="text">Luminárias Acesas:</div>
+              <div class="tensao" id="l_acesa"></div>
             </div>
-            <div class="luminaria-apagada">Luminárias apagadas: 6</div>
+            <div
+              class="luminaria-apagada"
+              style="background-color: #00BFFF; margin-top: 10px"
+            >
+              <div class="text">Luminárias apagadas:</div>
+              <div class="corrente" id="l_apagada"></div>
+            </div>
           </div>
-          <div class="temperatura">Tempo de Teste (min: 6 horas):</div>
+          <div class="tempo-de-teste">
+            <div class="text">Tempo de Teste (min: 6 horas):</div>
+            <div class="tempo" id="tempo"></div>
+          </div>
+          <div class="column">
+            <div class="div-tensao" style="background-color: #FA8072">
+              <div class="text">Tensão média das Luminárias</div>
+              <div class="tensao" id="tensao"></div>
+            </div>
+            <div
+              class="div-corrente"
+              style="background-color: #A9A9A9; margin-top: 10px"
+            >
+              <div class="text">Corrente média das Luminárias</div>
+              <div class="corrente" id="corrente"></div>
+            </div>
+          </div>
         </div>
-        <div class="grafico"></div>
       </div>
+          <canvas style="height: 200px;" id="myChart" class="chart"></canvas>
+          <canvas style="height: 200px;" id="myChart2" class="chart"></canvas>
+      <!-- Div pipico para exibir o dado[9] -->
+      <div class="tensao" id="tensao"></div>
+      <div class="corrente" id="corrente"></div>
     </div>
 
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Incluindo o Socket.IO -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
     <script>
       // Conecta ao servidor WebSocket
       var socket = io.connect(
-        "http://" + document.domain + ":" + location.port,
+        "http://" + document.domain + ":" + location.port
       );
-
+    
+      // Variáveis globais para armazenar os dados do gráfico
+      var listaDados = [];
+      var listaDadosV = [];
+      var listaDadosA = [];
+      var listaLabels = [];
+    
+      // Criação inicial do gráfico
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var ctx2 = document.getElementById('myChart2').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: listaLabels,  // Inicialmente vazias
+          datasets: [{
+            label: 'Número de Luminárias acesas',
+            data: listaDados,  // Inicialmente vazios
+            borderWidth: 1,
+            pointRadius: 3,
+            fill: true
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    
+      var myChart2 = new Chart(ctx2, {
+        data: {
+          labels: listaLabels,  // Inicialmente vazias
+          datasets: [{
+            type: 'line',
+            label: 'Tensão das Luminárias',
+            data: [],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderWidth: 1,
+            pointRadius: 3,
+            fill: true
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    
       // Escuta o evento 'novo_dado' emitido pelo servidor
       socket.on("novo_dado", function (data) {
         // Função para mostrar ou esconder a div com base no valor do dado
@@ -219,8 +332,8 @@
             elemento.style.display = "none"; // Oculta o dado
           }
         }
-
-        // Atualizando os dados das luminárias com base no valor recebido
+    
+        // Atualiza os dados das luminárias com base no valor recebido
         atualizarDado("dados1", data.dados[0]);
         atualizarDado("dados2", data.dados[1]);
         atualizarDado("dados3", data.dados[2]);
@@ -229,16 +342,46 @@
         atualizarDado("dados6", data.dados[5]);
         atualizarDado("dados7", data.dados[6]);
         atualizarDado("dados8", data.dados[7]);
+    
+        var l_acesa = document.getElementById("l_acesa");
+        var l_apagada = document.getElementById("l_apagada");
+        var tempo = document.getElementById("tempo");
+        var tensao = document.getElementById("tensao");
+        var corrente = document.getElementById("corrente");
+        l_acesa.textContent = `${data.dados[8]}`;
+        l_apagada.textContent = `${data.dados[9]}`;
+        tempo.textContent = `${data.dados[10]}`;
+        tensao.textContent = `${data.dados[11]} V`;
+        corrente.textContent = `${data.dados[12]} mA`;
+    
+        // Adiciona o novo dado à lista de dados
+        listaDados.push(data.dados[8]);
+        listaDadosV.push(data.dados[11]);  // Tensão
+        listaDadosA.push(data.dados[12]);  // Corrente
+    
+        // Adiciona uma nova label correspondente ao dado
+        listaLabels.push(listaLabels.length);  // Incrementa a label para a próxima posição no gráfico
+    
+        // Atualiza os dados e labels do gráfico
+        myChart.data.labels = listaLabels;  // Atualiza as labels
+        myChart.data.datasets[0].data = listaDados;  // Atualiza os dados
+    
+        myChart2.data.labels = listaLabels;  // Atualiza as labels
+        myChart2.data.datasets[0].data = listaDadosV;  // Atualiza os dados de Tensão
+        //myChart2.data.datasets[1].data = listaDadosA;  // Atualiza os dados de Corrente
+    
+        // Atualiza o gráfico com os novos dados
+        myChart.update();
+        myChart2.update();
       });
-
+    
       // Tratamento para erro
       socket.on("connect_error", function () {
         document.getElementById("erro").textContent =
           "Não foi possível se conectar ao servidor WebSocket.";
       });
-
-      // Função para enviar o valor 1 ao clicar no botão "Gerar alerta"
-      document.getElementById("lacesa").innerHTML = data.dados[7];
     </script>
+    
+    
   </body>
 </html>
