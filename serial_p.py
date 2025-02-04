@@ -10,21 +10,14 @@ socketio = SocketIO(app)
 # Função para ler dados da porta serial
 def read_serial():
     # Abre a porta COM4 com as configurações adequadas
-    with serial.Serial('COM4', 9600, timeout=1) as ser:
+    with serial.Serial('COM4', 115200, timeout=1) as ser:
         while True:
             # Lê uma linha de dados da porta serial
             data = ser.readline().decode('utf-8').strip()
             if data:
+                print("=====================================")
+                print(data)
                 data = data.split(" ")
-                print("=======================")
-                print(f"Luminária 1: {data[0]}")
-                print(f"Luminária 2: {data[1]}")
-                print(f"Luminária 3: {data[2]}")
-                print(f"Luminária 4: {data[3]}")
-                print(f"Luminária 5: {data[4]}")
-                print(f"Luminária 6: {data[5]}")
-                print(f"Luminária 7: {data[6]}")
-                print(f"Luminária 8: {data[7]}")
 
                 # Emite os dados para todos os clientes conectados via WebSocket
                 socketio.emit('novo_dado', {'dados': data})
