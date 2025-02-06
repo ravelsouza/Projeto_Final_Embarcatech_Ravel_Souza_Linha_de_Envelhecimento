@@ -88,6 +88,7 @@ int main() {
         }
         
         teste_esteira(pio, sm, 25, inicial[7], 7, simulacao);
+
         result = adc_read();
         tensao = result * conversion_factor;
         corrente = (tensao / 33)* 1000;
@@ -106,14 +107,16 @@ int main() {
             minutos += 1;
             start_time = time_us_32();
         }
-        if(minutos == 6)
+        while(minutos == 6)
         { 
-            while(gpio_get(BUTTON_A))
-            {
             buzzer_alerta();
+            if(gpio_get(BUTTON_A))
+            {
+                break;
             }
             
         } 
+        minutos = 0;
         sleep_ms(1000);
         }
         }
