@@ -112,11 +112,12 @@ int main() {
             buzzer_alerta();
             if(gpio_get(BUTTON_A))
             {
+                minutos = 0;
                 break;
             }
             
         } 
-        minutos = 0;
+        
         sleep_ms(1000);
         }
         }
