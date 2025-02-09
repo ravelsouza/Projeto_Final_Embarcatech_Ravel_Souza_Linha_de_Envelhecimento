@@ -1,4 +1,4 @@
-# ProjetoFinalEmbarcatech
+# Projeto Final Embarcatech
 
   A crescente demanda por equipamentos eletrônicos confiáveis e duráveis torna essencial a realização de testes rigorosos antes que esses produtos cheguem ao mercado. Para garantir sua qualidade e resistência ao uso contínuo, é necessário submetê-los a condições reais de operação por longos períodos. Nesse contexto, a Linha de Envelhecimento – ou Aging Line – surge como uma solução fundamental para avaliar o desempenho e a estabilidade de dispositivos como luminárias, displays e outros equipamentos elétricos.
   
