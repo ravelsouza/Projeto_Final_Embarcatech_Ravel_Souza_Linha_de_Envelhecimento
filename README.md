@@ -55,4 +55,46 @@ Este projeto propõe a automação de uma Linha de Envelhecimento (Aging Line) u
   - Tempo de teste decorrido  
 
 ## 📦 Organização do Projeto
+├── firmware/ # Código embarcado (C)
+│ ├── main.c
+│ ├── functions.h
+│ ├── includes.h
+│ ├── constantes.h
+│ └── CMakeLists.txt
+├── servidor/ # Código do servidor Flask (Python)
+│ └── app.py
+├── modelos_3D/ # Arquivos STL dos suportes e da linha de envelhecimento
+├── esquemáticos/ # Diagramas eletrônicos (EasyEDA e Wokwi)
+├── imagens/ # Fotos do projeto
+└── README.md****
 
+## 🔗 Links Importantes
+
+- 🔥 **Repositório do projeto:**  
+  [GitHub](https://github.com/ravelsouza/ProjetoFinalEmbarcatech_RavelSouza_Linha_de_Envelhecimento)
+
+- 🎥 **Demonstração do Projeto:**  
+  [Vídeo 1](https://youtu.be/UFJkonJxTpI) | [Vídeo 2](https://youtu.be/PXuLB3xBjKk)
+
+- 🧠 **Simulação no Wokwi:**  
+  [Ver simulação](https://wokwi.com/projects/421537041654796289)
+
+- 🖥️ **Documentação da placa BitDogLab:**  
+  [BitDogLab GitHub](https://github.com/BitDogLab/BitDogLab)
+
+## ✅ Como Executar o Projeto
+
+1. Clone este repositório.
+2. Suba o firmware para a Raspberry Pi Pico W.
+3. Configure o servidor Flask no seu computador (instale as dependências com `pip install flask`).
+4. Conecte a Pico W via USB e rode o servidor Flask.
+5. Acesse o dashboard gerado no navegador (geralmente em `http://127.0.0.1:5000`).
+6. Utilize os botões para iniciar e finalizar os testes.
+
+## 🏗️ Melhorias Futuras
+
+- Implementação de banco de dados para histórico dos testes.
+- Aplicação de filtros digitais para melhorar a precisão das medições.
+- Integração com machine learning para diagnóstico preditivo.
+- Criação de uma PCB dedicada para reduzir o uso de protoboard.
+- Evolução do dashboard para nuvem com acesso remoto.
