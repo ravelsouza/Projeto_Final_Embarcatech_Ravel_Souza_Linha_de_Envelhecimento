@@ -54,20 +54,6 @@ Este projeto propõe a automação de uma Linha de Envelhecimento (Aging Line) u
   - Corrente média e total  
   - Tempo de teste decorrido  
 
-## 📦 Organização do Projeto
-├── firmware/ # Código embarcado (C)
-│ ├── main.c
-│ ├── functions.h
-│ ├── includes.h
-│ ├── constantes.h
-│ └── CMakeLists.txt
-├── servidor/ # Código do servidor Flask (Python)
-│ └── app.py
-├── modelos_3D/ # Arquivos STL dos suportes e da linha de envelhecimento
-├── esquemáticos/ # Diagramas eletrônicos (EasyEDA e Wokwi)
-├── imagens/ # Fotos do projeto
-└── README.md
-
 ## 🔗 Links Importantes
 
 - 🔥 **Repositório do projeto:**  
