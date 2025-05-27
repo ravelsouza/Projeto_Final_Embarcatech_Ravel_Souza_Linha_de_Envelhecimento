@@ -66,7 +66,7 @@ Este projeto propõe a automação de uma Linha de Envelhecimento (Aging Line) u
 ├── modelos_3D/ # Arquivos STL dos suportes e da linha de envelhecimento
 ├── esquemáticos/ # Diagramas eletrônicos (EasyEDA e Wokwi)
 ├── imagens/ # Fotos do projeto
-└── README.md****
+└── README.md
 
 ## 🔗 Links Importantes
 
